@@ -5,9 +5,11 @@ import { RoomModule } from './room/room.module';
 import { MessageService } from './message/message.service';
 import { MessageModule } from './message/message.module';
 import { ChatModule } from './chat/chat.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [AuthModule, PrismaModule, RoomModule, MessageModule, ChatModule],
+  controllers: [AppController],
   providers: [ MessageService],
 })
 export class AppModule {}
