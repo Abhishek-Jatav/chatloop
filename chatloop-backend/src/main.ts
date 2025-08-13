@@ -4,9 +4,15 @@ import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors(); // 👈 Important for cross-origin
-  app.useWebSocketAdapter(new IoAdapter(app));
-await app.listen(process.env.PORT || 3000);
 
+  app.enableCors({
+    origin: process.env.FRONTEND_URL || '*', // frontend URL from .env
+    credentials: true,
+  });
+
+  app.useWebSocketAdapter(new IoAdapter(app));
+
+  await app.listen(process.env.PORT || 3000);
+  console.log(`Backend running on port ${process.env.PORT || 3000}`);
 }
 bootstrap();
