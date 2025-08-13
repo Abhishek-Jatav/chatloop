@@ -1,10 +1,9 @@
-// app/rooms/[id]/page.tsx
-
 "use client";
 
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Cookies from "js-cookie";
+import { toast, Toaster } from "react-hot-toast";
 
 export default function RoomPage() {
   const { id } = useParams();
@@ -28,7 +27,7 @@ export default function RoomPage() {
         `http://localhost:3000/rooms/${id}/messages?t=${Date.now()}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-          cache: "no-store", // prevent caching
+          cache: "no-store",
         }
       );
       if (!res.ok) throw new Error("Failed to fetch messages");
@@ -36,6 +35,7 @@ export default function RoomPage() {
       setMessages(msgs);
     } catch (err) {
       console.error(err);
+      toast.error("Error fetching messages");
     }
   };
 
@@ -57,6 +57,7 @@ export default function RoomPage() {
         setRoom({ id, users });
       } catch (error) {
         console.error(error);
+        toast.error("Failed to load room details");
       } finally {
         setLoading(false);
       }
@@ -65,8 +66,7 @@ export default function RoomPage() {
     fetchRoomDetails();
     fetchMessages();
 
-    const interval = setInterval(fetchMessages, 3000); // poll every 3 sec
-
+    const interval = setInterval(fetchMessages, 3000);
     return () => clearInterval(interval);
   }, [id, token]);
 
@@ -89,33 +89,39 @@ export default function RoomPage() {
 
       if (!res.ok) throw new Error("Failed to send message");
       setNewMessage("");
-      fetchMessages(); // refresh instantly
+      fetchMessages();
+      toast.success("Message sent");
     } catch (error) {
       console.error(error);
-      alert("Error sending message");
+      toast.error("Error sending message");
     }
   };
 
-  if (loading) return <p className="p-4">Loading room...</p>;
-  if (!room) return <p className="p-4">Room not found</p>;
+  if (loading)
+    return <p className="p-4 text-gray-300 text-lg">Loading room...</p>;
+  if (!room) return <p className="p-4 text-gray-300 text-lg">Room not found</p>;
 
   return (
-    <main className="p-6">
+    <main className="min-h-screen bg-gray-900 text-gray-200 p-4 sm:p-6 md:p-8">
+      <Toaster position="top-right" reverseOrder={false} />
+
       {/* Room Details */}
-      <div className="bg-white shadow rounded p-4 mb-4">
-        <h1 className="text-2xl font-bold">Room ID: {room.id}</h1>
-        <p className="text-gray-600">Members in this room:</p>
-        <ul className="list-disc list-inside mb-4">
+      <div className="bg-gray-800 shadow rounded p-4 mb-4">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">
+          Room ID: {room.id}
+        </h1>
+        <p className="text-gray-400 text-lg mb-2">Members in this room:</p>
+        <ul className="list-disc list-inside space-y-1">
           {room.users.map((user: any) => {
             const isCurrentUser = String(currentUser?.id) === String(user.id);
             return (
               <li
                 key={user.id}
-                className={
+                className={`text-lg p-1 rounded ${
                   isCurrentUser
-                    ? "text-lg font-bold text-blue-700 bg-blue-100 p-1 rounded"
-                    : "text-gray-800"
-                }>
+                    ? "font-bold text-blue-300 bg-blue-900"
+                    : "text-gray-200"
+                }`}>
                 {user.username} ({user.email}){isCurrentUser && " ← You"}
               </li>
             );
@@ -124,15 +130,19 @@ export default function RoomPage() {
       </div>
 
       {/* Messages */}
-      <div className="bg-white shadow rounded p-4 mb-4 max-h-[400px] overflow-y-auto">
-        <h2 className="text-xl font-semibold mb-2">Messages</h2>
+      <div className="bg-gray-800 shadow rounded p-4 mb-4 max-h-[400px] overflow-y-auto">
+        <h2 className="text-xl md:text-2xl font-semibold mb-3">Messages</h2>
         {messages.length > 0 ? (
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {messages.map((msg) => (
-              <li key={msg.id} className="border-b pb-2">
-                <strong>{msg.sender.username}: </strong>
+              <li
+                key={msg.id}
+                className="border-b border-gray-700 pb-2 text-lg">
+                <strong className="text-blue-300">
+                  {msg.sender.username}:
+                </strong>{" "}
                 <span>{msg.content}</span>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-500 mt-1">
                   {new Date(msg.createdAt).toLocaleString()}
                 </div>
               </li>
@@ -140,22 +150,22 @@ export default function RoomPage() {
             <div ref={messagesEndRef} />
           </ul>
         ) : (
-          <p className="text-gray-500">No messages yet.</p>
+          <p className="text-gray-500 text-lg">No messages yet.</p>
         )}
       </div>
 
       {/* Send Message */}
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-3">
         <input
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type your message..."
-          className="flex-1 border rounded px-3 py-2"
+          className="flex-1 border border-gray-700 bg-gray-700 text-gray-200 rounded px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={handleSendMessage}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          className="bg-blue-600 text-white px-4 py-2 rounded text-lg hover:bg-blue-700 transition">
           Send
         </button>
       </div>
