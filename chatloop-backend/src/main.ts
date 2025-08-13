@@ -6,6 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors(); // 👈 Important for cross-origin
   app.useWebSocketAdapter(new IoAdapter(app));
-  await app.listen(3000); // 👈 Make sure it's 3001
+await app.listen(process.env.PORT || 3000);
+
 }
 bootstrap();
