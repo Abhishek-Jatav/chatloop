@@ -6,10 +6,11 @@ import { MessageService } from './message/message.service';
 import { MessageModule } from './message/message.module';
 import { ChatModule } from './chat/chat.module';
 import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [AuthModule, PrismaModule, RoomModule, MessageModule, ChatModule],
   controllers: [AppController],
-  providers: [ MessageService],
+  providers: [ MessageService , AppService ],
 })
 export class AppModule {}
