@@ -27,11 +27,14 @@ export default function RoomList() {
   const fetchRooms = async () => {
     if (!token) return;
     try {
-      const res = await fetch("http://localhost:3000/rooms/joined-and-not", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/rooms/joined-and-not`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to fetch rooms");
 
@@ -49,7 +52,7 @@ export default function RoomList() {
   const joinRoom = async (roomId: string) => {
     if (!confirm("Are you sure you want to join this room?")) return;
     try {
-      const res = await fetch("http://localhost:3000/rooms/join", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms/join`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -71,14 +74,17 @@ export default function RoomList() {
   const leaveRoom = async (roomId: string) => {
     if (!confirm("Are you sure you want to leave this room?")) return;
     try {
-      const res = await fetch("http://localhost:3000/rooms/leave", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ roomId }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/rooms/leave`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ roomId }),
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to leave room");
 

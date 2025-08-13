@@ -24,7 +24,9 @@ export default function RoomPage() {
   const fetchMessages = async () => {
     try {
       const res = await fetch(
-        `http://localhost:3000/rooms/${id}/messages?t=${Date.now()}`,
+        `${
+          process.env.NEXT_PUBLIC_API_URL
+        }/rooms/${id}/messages?t=${Date.now()}`,
         {
           headers: { Authorization: `Bearer ${token}` },
           cache: "no-store",
@@ -45,7 +47,9 @@ export default function RoomPage() {
     const fetchRoomDetails = async () => {
       try {
         const resUsers = await fetch(
-          `http://localhost:3000/rooms/${id}/users?t=${Date.now()}`,
+          `${
+            process.env.NEXT_PUBLIC_API_URL
+          }/rooms/${id}/users?t=${Date.now()}`,
           {
             headers: { Authorization: `Bearer ${token}` },
             cache: "no-store",
@@ -78,14 +82,17 @@ export default function RoomPage() {
     if (!newMessage.trim()) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/rooms/${id}/messages`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ content: newMessage }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/rooms/${id}/messages`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ content: newMessage }),
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to send message");
       setNewMessage("");

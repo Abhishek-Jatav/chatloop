@@ -51,14 +51,17 @@ export default function ProfilePage() {
     setCreateMessage(null);
 
     try {
-      const res = await fetch("http://localhost:3000/rooms/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name: roomName, isGroup }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/rooms/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name: roomName, isGroup }),
+        }
+      );
 
       if (!res.ok) {
         const err = await res.json();
